@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -17,9 +19,10 @@ public class HelperFunctions {
             System.out.println("This word doesn't exist in any file");
             System.out.println("");
         }
+        
     }
 
-    public static void PrintAll(HashMap<String, DictEntry> index) {
+    /*public static void PrintAll(HashMap<String, DictEntry> index) {
         index.forEach((key, entry) -> {
             System.out.println(key + " -> doc_freq: " + entry.doc_freq + " ,term_freq: " + entry.term_freq);
             Posting currPosting = entry.pList;
@@ -28,6 +31,23 @@ public class HelperFunctions {
                 currPosting = currPosting.next;
             }
             System.out.println("");
+        });
+    }*/
+    
+    public static void PrintAll(HashMap<String, DictEntry> index) {
+        ArrayList<String> sortedKeys = new ArrayList<>(index.keySet());
+        Collections.sort(sortedKeys);
+        for (String key : sortedKeys) {
+            DictEntry entry = index.get(key);
+            System.out.println(key + " -> doc_freq: " + entry.doc_freq + " ,term_freq: " + entry.term_freq);
+            Posting currPosting = entry.pList;
+            while (currPosting != null) {
+                System.out.println("docId: " + currPosting.docId + " ,dtf: " + currPosting.dtf);
+                currPosting = currPosting.next;
+            }
+            System.out.println("");
+        }
+        index.forEach((key, entry) -> {
         });
     }
 
@@ -41,7 +61,7 @@ public class HelperFunctions {
         } else if (option == 2) {
             System.out.print("Enter word to search for: ");
             String word = scanner.next();
-            HelperFunctions.Search(index, word);
+            HelperFunctions.Search(index, word.toLowerCase());
         } else {
             scanner.close();
             return;
