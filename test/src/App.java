@@ -20,20 +20,20 @@ public class App {
                 String[] words = line.split("\\W+");
                 for (String word : words) {
                     ///Removing of Stop Words
-                    if(word.equals("a") || word.equals("the") || word.equals("an") || word.equals("is") || word.equals("we") || word.equals("i") ){
+                    if(word.equals("a") || word.equals("the") || word.equals("an") || word.equals("is") || word.equals("we") || word.equals("i") || word.equals("by") || word.equals("be") || word.equals("for") || word.equals("in")){
                         continue;
                     }else{
                         if (index.containsKey(word)) {
                             DictEntry entry = index.get(word);
                             Posting currPosting = entry.pList;
-                            while (currPosting.docId != i && currPosting.next != null) {
+                            while (currPosting.docId != i+1 && currPosting.next != null) {
                                 currPosting = currPosting.next;
                             }
-                            if (currPosting.docId == i) {
+                            if (currPosting.docId == i+1) {
                                 currPosting.dtf++;
                                 entry.term_freq++;
                             } else {
-                                Posting newPosting = new Posting(i);
+                                Posting newPosting = new Posting(i+1);
                                 currPosting.next = newPosting;
                                 entry.doc_freq++;
                                 entry.term_freq++;
@@ -41,7 +41,7 @@ public class App {
     
                         } else {
                             DictEntry entry = new DictEntry();
-                            entry.pList = new Posting(i);
+                            entry.pList = new Posting(i+1);
                             index.put(word, entry);
                         }
                     }
