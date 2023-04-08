@@ -17,33 +17,36 @@ public class App {
             DataInputStream df = new DataInputStream(new FileInputStream(fileList[i]));
             String line;
             while ((line = df.readLine()) != null) {
-                // Input: "The quick brown fox jumps over the lazy dog."
-                // Output: ["The", "quick", "brown", "fox", "jumps", "over", "the", "lazy",
-                // "dog"]
                 String[] words = line.split("\\W+");
                 for (String word : words) {
-                    // System.out.println(i+" "+word);
-                    if (index.containsKey(word)) {
-                        DictEntry entry = index.get(word);
-                        Posting currPosting = entry.pList;
-                        while (currPosting.docId != i && currPosting.next != null) {
-                            currPosting = currPosting.next;
-                        }
-                        if (currPosting.docId == i) {
-                            currPosting.dtf++;
-                            entry.term_freq++;
+                    ///Removing of Stop Words
+                    if(word.equals("a") || word.equals("the") || word.equals("an") || word.equals("is") || word.equals("we") || word.equals("i") ){
+                        continue;
+                    }else{
+                        if (index.containsKey(word)) {
+                            DictEntry entry = index.get(word);
+                            Posting currPosting = entry.pList;
+                            while (currPosting.docId != i && currPosting.next != null) {
+                                currPosting = currPosting.next;
+                            }
+                            if (currPosting.docId == i) {
+                                currPosting.dtf++;
+                                entry.term_freq++;
+                            } else {
+                                Posting newPosting = new Posting(i);
+                                currPosting.next = newPosting;
+                                entry.doc_freq++;
+                                entry.term_freq++;
+                            }
+    
                         } else {
-                            Posting newPosting = new Posting(i);
-                            currPosting.next = newPosting;
-                            entry.doc_freq++;
-                            entry.term_freq++;
+                            DictEntry entry = new DictEntry();
+                            entry.pList = new Posting(i);
+                            index.put(word, entry);
                         }
-
-                    } else {
-                        DictEntry entry = new DictEntry();
-                        entry.pList = new Posting(i);
-                        index.put(word, entry);
                     }
+                    
+                    
                 }
 
             }
