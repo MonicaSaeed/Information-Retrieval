@@ -197,6 +197,38 @@ public class HelperFunctions {
         return result;
     }
 
+    //calculate the tf-idf of the term in the document
+    public static float getTfIdf(HashMap<String, DictEntry> index, String term, int docId, int N) {
+        return (getIdf(index, term, docId, N) * (float)getTF(index, term, docId));
+    }
+
+
+    //calculate the idf of the term in the document
+    public static float getIdf(HashMap<String, DictEntry> index, String term, int docId, int N) {
+        float idf = 0;
+        if (index.containsKey(term)) {
+            DictEntry entry = index.get(term);  
+            idf = (float) Math.log10(N / entry.doc_freq);
+        }
+        return idf;
+    }
+    //get the term frequency of the query
+    public static int getTF(HashMap<String, DictEntry> index, String term, int docId){
+        int tf = 0;
+        if (index.containsKey(term)) {
+            DictEntry entry = index.get(term);
+            Posting currPosting = entry.pList;
+            while (currPosting != null) {
+                if (currPosting.docId == docId) {
+                    tf = currPosting.dtf;
+                    break;
+                }
+                currPosting = currPosting.next;
+            }
+        }
+        return tf;
+    }
+
     public static void getPageLinks(String URL) throws IOException  {
 
         //4. Check if you have already crawled the URLs
@@ -229,7 +261,7 @@ public class HelperFunctions {
     public static void PrintMenu(HashMap<String, DictEntry> index) throws IOException {
         Scanner scanner = new Scanner(System.in);
         System.out.println(
-                "1.Print All\n2.Search\n3.Query\n4.compute the cosine similarity between each file and the query\n5.web crawling\n6.Exit");
+                "1.Print All\n2.Search\n3.Query\n4.compute the cosine similarity between each file and the query\n5.web crawling\n6.calculate TfIdf\n7.calculate IDF\n8.Exit");
         System.out.print("Choose: ");
         int option = scanner.nextInt();
         if (option == 1) {
@@ -288,18 +320,30 @@ public class HelperFunctions {
                 System.out.println(mapping.getKey() + ":" + mapping.getValue());
             }
 
-        }
-        else if(option==5)
-        {
+        }else if(option==5){
             Scanner scan = new Scanner(System.in);
             String link = "";
             System.out.print("Enter a link:");
             link += scan.nextLine();
-            HelperFunctions.getPageLinks(link);
+            // HelperFunctions.getPageLinks(link);
             System.out.println();
 
-        }
-        else {
+        } else if (option == 6) {
+            Scanner scn = new Scanner(System.in);
+            System.out.println("Enter a word:");
+            String word = scn.nextLine();
+            System.out.println("Enter a docId:");
+            int docId = scn.nextInt();
+            System.out.println("TfIdf: " + HelperFunctions.getTfIdf(index, word, docId, 10));
+        } 
+        else if(option==7){
+            Scanner scn = new Scanner(System.in);
+            System.out.println("Enter a word:");
+            String word = scn.nextLine();
+            System.out.println("Enter a docId:");
+            int docId = scn.nextInt();
+            System.out.println("Idf: " + HelperFunctions.getIdf(index, word, docId, 10));
+        }else {
             scanner.close();
             return;
         }
