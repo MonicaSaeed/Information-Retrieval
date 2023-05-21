@@ -229,32 +229,31 @@ public class HelperFunctions {
         return tf;
     }
 
-    public static void getPageLinks(String URL) throws IOException  {
+    public static void getPageLinks(String URL) throws IOException {
 
-        //4. Check if you have already crawled the URLs
-        //(we are intentionally not checking for duplicate content in this example)
-         Vector<String>links=new Vector<>();
-         if (!links.contains(URL)) {
-             try {
-                 //4. (i) If not add it to the index
-                 if (links.add(URL)) {
-                     System.out.println(URL);
-                 }
-                 //2. Fetch the HTML code
-                 Document document = Jsoup.connect(URL).get();//jsoup jar to extract web data
-                 //3. Parse the HTML to extract links to other URLs
-                 Elements linksOnPage = document.select("a[href]");
+        // 4. Check if you have already crawled the URLs
+        // (we are intentionally not checking for duplicate content in this example)
+        Vector<String> links = new Vector<>();
+        if (!links.contains(URL)) {
+            try {
+                // 4. (i) If not add it to the index
+                if (links.add(URL)) {
+                    System.out.println(URL);
+                }
+                // 2. Fetch the HTML code
+                Document document = Jsoup.connect(URL).get();// jsoup jar to extract web data
+                // 3. Parse the HTML to extract links to other URLs
+                Elements linksOnPage = document.select("a[href]");
 
-                 //5. For each extracted URL... go back to Step 4.
-                 for (Element page : linksOnPage) {
-                     getPageLinks(page.attr("abs:href"));
+                // 5. For each extracted URL... go back to Step 4.
+                for (Element page : linksOnPage) {
+                    getPageLinks(page.attr("abs:href"));
 
-                 }
-             }
-        catch (IOException e) {
-            System.err.println("For '" + URL + "': " + e.getMessage());
+                }
+            } catch (IOException e) {
+                System.err.println("For '" + URL + "': " + e.getMessage());
+            }
         }
-         }
     }
 
 
