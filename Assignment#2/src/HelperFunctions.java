@@ -1,3 +1,9 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,6 +15,7 @@ import java.util.Vector;
 
 
 public class HelperFunctions {
+
     public static void Search(HashMap<String, DictEntry> index, String word) {
         if (index.containsKey(word)) {
             DictEntry entry = index.get(word);
@@ -189,14 +196,40 @@ public class HelperFunctions {
         }
         return result;
     }
-    
+
+    public static void getPageLinks(String URL) throws IOException  {
+
+        //4. Check if you have already crawled the URLs
+        //(we are intentionally not checking for duplicate content in this example)
+         Vector<String>links=new Vector<>();
+         if (!links.contains(URL)) {
+             try {
+                 //4. (i) If not add it to the index
+                 if (links.add(URL)) {
+                     System.out.println(URL);
+                 }
+                 //2. Fetch the HTML code
+                 Document document = Jsoup.connect(URL).get();//jsoup jar to extract web data
+                 //3. Parse the HTML to extract links to other URLs
+                 Elements linksOnPage = document.select("a[href]");
+
+                 //5. For each extracted URL... go back to Step 4.
+                 for (Element page : linksOnPage) {
+                     getPageLinks(page.attr("abs:href"));
+
+                 }
+             }
+        catch (IOException e) {
+            System.err.println("For '" + URL + "': " + e.getMessage());
+        }
+         }
+    }
 
 
-
-    public static void PrintMenu(HashMap<String, DictEntry> index) {
+    public static void PrintMenu(HashMap<String, DictEntry> index) throws IOException {
         Scanner scanner = new Scanner(System.in);
         System.out.println(
-                "1.Print All\n2.Search\n3.Query\n4.compute the cosine similarity between each file and the query\n5.Exit");
+                "1.Print All\n2.Search\n3.Query\n4.compute the cosine similarity between each file and the query\n5.web crawling\n6.Exit");
         System.out.print("Choose: ");
         int option = scanner.nextInt();
         if (option == 1) {
@@ -255,7 +288,18 @@ public class HelperFunctions {
                 System.out.println(mapping.getKey() + ":" + mapping.getValue());
             }
 
-        } else {
+        }
+        else if(option==5)
+        {
+            Scanner scan = new Scanner(System.in);
+            String link = "";
+            System.out.print("Enter a link:");
+            link += scan.nextLine();
+            HelperFunctions.getPageLinks(link);
+            System.out.println();
+
+        }
+        else {
             scanner.close();
             return;
         }
@@ -273,5 +317,7 @@ public class HelperFunctions {
         
         return termFrequencies;
     }
+
+
 
 }
