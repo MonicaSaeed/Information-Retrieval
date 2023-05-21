@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class HelperFunctions {
@@ -123,11 +124,72 @@ public class HelperFunctions {
         return result;
     }
 
+    public static ArrayList<Float> getCosineSimilarity(HashMap<String, DictEntry> index, String[] query, int N) {
+        Map<String, Integer> queryTermFrequency = computeTermFrequencies(query);
+        ArrayList<Float> result = new ArrayList<Float>();
+        ArrayList<ArrayList<Integer>> cosineVector = new ArrayList<>();
+        // row 0 is for query
+        cosineVector.add(new ArrayList<Integer>());
+        for (Map.Entry<String, Integer> mapEntry : queryTermFrequency.entrySet()) {
+            cosineVector.get(0).add(mapEntry.getValue());
+        }
+        // row 1 to N is for documents
+        for (int i = 1; i <= N; i++) {
+            cosineVector.add(new ArrayList<Integer>());
+            for (int j = 0; j < queryTermFrequency.size(); j++) {
+                cosineVector.get(i).add(0);
+            }
+        }
+        //// a b c d a a b d
+        // 3 2 1 2
+        // 0 0 0 0
+        //.....(N)
+        // 0 0 0 0
+        int i = 0;
+        for (Map.Entry<String, Integer> mapEntry : queryTermFrequency.entrySet()) {
+            String word = mapEntry.getKey();
+            if (index.containsKey(word)) {
+                DictEntry entry = index.get(word);
+                Posting currPosting = entry.pList;
+                while (currPosting != null) {
+                    cosineVector.get(currPosting.docId).set(i, currPosting.dtf);
+                    currPosting = currPosting.next;
+                }
+            }
+            i++;
+        }
+
+        result = computeCosineSimilarity(cosineVector);
+        
+        return result;
+    }
+
+    
+    private static ArrayList<Float> computeCosineSimilarity(ArrayList<ArrayList<Integer>> cosineVector) {
+        ArrayList<Float> result = new ArrayList<Float>();
+        for (int i = 1; i < cosineVector.size(); i++) {
+            float cosineSimilarity = 0;
+            float dotProduct = 0;
+            float queryMagnitude = 0;
+            float docMagnitude = 0;
+            for (int j = 0; j < cosineVector.get(0).size(); j++) {
+                dotProduct += cosineVector.get(0).get(j) * cosineVector.get(i).get(j);
+                queryMagnitude += cosineVector.get(0).get(j) * cosineVector.get(0).get(j);
+                docMagnitude += cosineVector.get(i).get(j) * cosineVector.get(i).get(j);
+            }
+            cosineSimilarity = (float) (dotProduct / (Math.sqrt(queryMagnitude) * Math.sqrt(docMagnitude)));
+            result.add(cosineSimilarity);
+        }
+        return result;
+    }
+    
+
 
 
     public static void PrintMenu(HashMap<String, DictEntry> index) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("1.Print All\n2.Search\n3.Query\n4.Exit");
+        System.out.println(
+                "1.Print All\n2.Search\n3.Query\n4.compute the cosine similarity between each file and the query\n5.Exit");
         System.out.print("Choose: ");
         int option = scanner.nextInt();
         if (option == 1) {
@@ -139,22 +201,30 @@ public class HelperFunctions {
         } else if (option == 3) {
             //String[] words = line.split("\\W+");
             Scanner scan = new Scanner(System.in);
-            String word="";
+            String word = "";
             System.out.print("Enter query:");
             word += scan.nextLine();
             ArrayList<Integer> result = HelperFunctions.getQueryResult(index, word.split(" "));
-            if(result.size() == 0){
+            if (result.size() == 0) {
                 System.out.println("No results found");
-            }
-            else{
+            } else {
                 System.out.println("Documents: ");
-                for(int i = 0; i < result.size(); i++){
+                for (int i = 0; i < result.size(); i++) {
                     System.out.println(result.get(i));
                 }
             }
-            
-        }
-        else {
+
+        } else if (option == 4) {
+            Scanner scan = new Scanner(System.in);
+            String word = "";
+            System.out.print("Enter query:");
+            word += scan.nextLine();
+            ArrayList<Float> result = HelperFunctions.getCosineSimilarity(index, word.split(" "), 10);
+            System.out.println("Cosine similarity: ");
+            for (int i = 0; i < result.size(); i++) {
+                System.out.println(result.get(i));
+            }
+        } else {
             scanner.close();
             return;
         }
@@ -162,4 +232,15 @@ public class HelperFunctions {
         PrintMenu(index);
         scanner.close();
     }
+
+    private static HashMap<String, Integer> computeTermFrequencies(String[] words) {
+        HashMap<String, Integer> termFrequencies = new HashMap<>();
+
+        for (String word : words) {
+            termFrequencies.put(word, termFrequencies.getOrDefault(word, 0) + 1);
+        }
+        
+        return termFrequencies;
+    }
+
 }
