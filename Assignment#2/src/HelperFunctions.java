@@ -1,8 +1,12 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Vector;
+
 
 public class HelperFunctions {
     public static void Search(HashMap<String, DictEntry> index, String word) {
@@ -82,11 +86,14 @@ public class HelperFunctions {
         }
         return result;
     }
-    // 1 2 3 4(5,17,19) 5(19)
-    // 4(6,13,20) 5(20) 6 
-    ////4(6,20)5(20)
-    // 1 4(7,14) 6
+    //(tota (nervana) monica) 
+    // 1 2 3 4(5,17,19) 5(19) ->r
+    // 4(6,13,20) 5(20) 6  ->r
+    ////4(6,20)5(20) tota nervana ->doc 4(6,20), 5(20)
+    // 1 4(7,14) 6 ->r
     ////4(7)
+    
+    
     // 1 3 4(8)
 
     //get two posting lists and return the intersection of them
@@ -224,6 +231,30 @@ public class HelperFunctions {
             for (int i = 0; i < result.size(); i++) {
                 System.out.println(result.get(i));
             }
+            System.out.println("rank the 10 files according to the value of the cosin similarity");
+            //save id,cosine similarity to a hashmap
+            HashMap<Integer, Float> map = new HashMap<>();
+            for (int i = 0; i < result.size(); i++) {
+                if(result.get(i).equals(null)){
+                    map.put(i+1, (float)0);
+                }else{
+                    map.put(i+1, result.get(i));
+                }
+                
+            }
+            //sort the hashmap
+            List<Map.Entry<Integer, Float>> list = new ArrayList<Map.Entry<Integer, Float>>(map.entrySet());
+            Collections.sort(list, new Comparator<Map.Entry<Integer, Float>>() {
+                //descending order
+                public int compare(Map.Entry<Integer, Float> o1, Map.Entry<Integer, Float> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+            //print the sorted hashmap
+            for (Map.Entry<Integer, Float> mapping : list) {
+                System.out.println(mapping.getKey() + ":" + mapping.getValue());
+            }
+
         } else {
             scanner.close();
             return;
