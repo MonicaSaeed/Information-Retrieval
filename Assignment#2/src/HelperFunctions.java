@@ -235,7 +235,7 @@ public class HelperFunctions {
             //save id,cosine similarity to a hashmap
             HashMap<Integer, Float> map = new HashMap<>();
             for (int i = 0; i < result.size(); i++) {
-                if(result.get(i).equals(null)){
+                if(Double.isNaN(result.get(i))){
                     map.put(i+1, (float)0);
                 }else{
                     map.put(i+1, result.get(i));
