@@ -4,14 +4,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Vector;
+import java.util.*;
 
 
 public class HelperFunctions {
@@ -228,14 +221,14 @@ public class HelperFunctions {
         }
         return tf;
     }
-
+    static Vector<String> links = new Vector<>();
     public static void getPageLinks(String URL) throws IOException {
 
         // 4. Check if you have already crawled the URLs
         // (we are intentionally not checking for duplicate content in this example)
-        Vector<String> links = new Vector<>();
-        if (!links.contains(URL)) {
-            try {
+
+       if (!links.contains(URL)) {
+           try{
                 // 4. (i) If not add it to the index
                 if (links.add(URL)) {
                     System.out.println(URL);
@@ -324,7 +317,7 @@ public class HelperFunctions {
             String link = "";
             System.out.print("Enter a link:");
             link += scan.nextLine();
-            // HelperFunctions.getPageLinks(link);
+            HelperFunctions.getPageLinks(link);
             System.out.println();
 
         } else if (option == 6) {
