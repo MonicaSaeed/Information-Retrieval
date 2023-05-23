@@ -199,12 +199,12 @@ public class HelperFunctions {
 
     //calculate the tf-idf of the term in the document
     public static float getTfIdf(HashMap<String, DictEntry> index, String term, int docId, int N) {
-        return (getIdf(index, term, docId, N) * (float)getTF(index, term, docId));
+        return (getIdf(index, term, N) * (float)getTF(index, term, docId));
     }
 
 
     //calculate the idf of the term in the document
-    public static float getIdf(HashMap<String, DictEntry> index, String term, int docId, int N) {
+    public static float getIdf(HashMap<String, DictEntry> index, String term, int N) {
         float idf = 0;
         if (index.containsKey(term)) {
             DictEntry entry = index.get(term);  
@@ -339,9 +339,7 @@ public class HelperFunctions {
             Scanner scn = new Scanner(System.in);
             System.out.println("Enter a word:");
             String word = scn.nextLine();
-            System.out.println("Enter a docId:");
-            int docId = scn.nextInt();
-            System.out.println("Idf: " + HelperFunctions.getIdf(index, word, docId, 10));
+            System.out.println("Idf: " + HelperFunctions.getIdf(index, word, 10));
         }else {
             scanner.close();
             return;
